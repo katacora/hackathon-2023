@@ -1,6 +1,7 @@
 import sys, os, random
 import pygame
 
+
 # Initialize Pygame
 pygame.init()
 
@@ -18,10 +19,6 @@ SNAKE_SIZE = 20
 snake = [pygame.Rect(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2, SNAKE_SIZE, SNAKE_SIZE)]
 snake_direction = "right"
 
-# Set up the food
-FOOD_SIZE = 20
-food = pygame.Rect(random.randint(0, WINDOW_WIDTH - FOOD_SIZE), random.randint(0, WINDOW_HEIGHT - FOOD_SIZE), FOOD_SIZE, FOOD_SIZE)
-
 # Set up the score
 score = 0
 font = pygame.font.SysFont(None, 30)
@@ -34,13 +31,72 @@ def play_music():
 
 play_music()
 
-# Game loop
+# Function to display the Game Over screen
+def game_over():
+    game_over_text = font.render("Game Over", True, (255, 0, 0))
+    window.blit(game_over_text, (WINDOW_WIDTH // 2 - 60, WINDOW_HEIGHT // 2))
+    pygame.display.flip()
+    pygame.time.delay(1000)  # Wait for 1 second
+    pygame.quit()
+    sys.exit()
+
+# Function to generate food at a random location
+def generate_food():
+    return pygame.Rect(random.randint(0, WINDOW_WIDTH - SNAKE_SIZE), random.randint(0, WINDOW_HEIGHT - SNAKE_SIZE), SNAKE_SIZE, SNAKE_SIZE)
+
+# Set up the initial food
+food = generate_food()
+
+# Main menu
+def main_menu():
+    menu_font = pygame.font.SysFont(None, 50)
+    title_text = menu_font.render("Snake Game", True, (255, 255, 255))
+    easy_text = menu_font.render("Press 'E' for Easy", True, (255, 255, 255))
+    medium_text = menu_font.render("Press 'M' for Medium", True, (255, 255, 255))
+    hard_text = menu_font.render("Press 'H' for Hard", True, (255, 255, 255))
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_e:
+                    return 5  # Easy mode (5 pieces of food)
+                elif event.key == pygame.K_m:
+                    return 3  # Medium mode (3 pieces of food)
+                elif event.key == pygame.K_h:
+                    return 1  # Hard mode (1 piece of food)
+
+        window.fill((0, 0, 0))
+        window.blit(title_text, (WINDOW_WIDTH // 2 - 90, 100))
+        window.blit(easy_text, (WINDOW_WIDTH // 2 - 120, 200))
+        window.blit(medium_text, (WINDOW_WIDTH // 2 - 140, 250))
+        window.blit(hard_text, (WINDOW_WIDTH // 2 - 110, 300))
+        pygame.display.flip()
+
+# Get the selected difficulty
+food_count = main_menu()
+
+# Set up the food based on the selected difficulty
+if food_count == 5:  # Easy mode
+    FOOD_COUNT = 5
+elif food_count == 3:  # Medium mode
+    FOOD_COUNT = 3
+else:  # Hard mode
+    FOOD_COUNT = 1
+
+food_list = [generate_food() for _ in range(FOOD_COUNT)]
+
 while True:
     # Handle events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+
+    # Reset has_eaten
+    has_eaten = False
 
     # Move the snake
     if snake_direction == "right":
@@ -62,22 +118,26 @@ while True:
     elif new_head.bottom > WINDOW_HEIGHT:
         new_head.top = 0
 
-
     # Check if the snake hit itself
     if new_head in snake:
-        pygame.quit()
-        sys.exit()
+        game_over()  # Call the Game Over function
+        break
 
     # Check if the snake ate the food
-    if new_head.colliderect(food):
-        food.x = random.randint(0, WINDOW_WIDTH - FOOD_SIZE)
-        food.y = random.randint(0, WINDOW_HEIGHT - FOOD_SIZE)
-        score += 1
-    else:
-        snake.pop(0)
+    for food in food_list:
+        if new_head.colliderect(food):
+            food_list.remove(food)
+            food_list.append(generate_food())
+            score += 1
+            has_eaten = True
 
     # Add the new head to the snake
     snake.append(new_head)
+
+    # If the snake hasn't eaten, remove the tail segment
+    if not has_eaten:
+        snake.pop(0)
+
 
     # Handle input
     keys = pygame.key.get_pressed()
@@ -96,9 +156,10 @@ while True:
     # Draw the snake and food
     for segment in snake:
         pygame.draw.rect(window, (255, 255, 255), segment)
-    pygame.draw.rect(window, (255, 0, 0), food)
+    for food in food_list:
+        pygame.draw.rect(window, (255, 0, 0), food)
 
-        # Draw the score
+    # Draw the score
     score_text = font.render("Score: " + str(score), True, (255, 255, 255))
     window.blit(score_text, (10, 10))
 
@@ -106,4 +167,4 @@ while True:
     pygame.display.flip()
 
     # Limit the frame rate
-    clock.tick(20)
+    clock.tick(10)  # Reduced frame rate for a slower snake
