@@ -23,6 +23,11 @@ snake_direction = "right"
 FOOD_SIZE = 20
 food = pygame.Rect(random.randint(0, WINDOW_WIDTH - FOOD_SIZE), random.randint(0, WINDOW_HEIGHT - FOOD_SIZE), FOOD_SIZE, FOOD_SIZE)
 
+# Set up the score
+score = 0
+font = pygame.font.SysFont(None, 30)
+
+
 # Game loop
 while True:
     # Handle events
@@ -61,6 +66,7 @@ while True:
     if new_head.colliderect(food):
         food.x = random.randint(0, WINDOW_WIDTH - FOOD_SIZE)
         food.y = random.randint(0, WINDOW_HEIGHT - FOOD_SIZE)
+        score += 1
     else:
         snake.pop(0)
 
@@ -85,6 +91,10 @@ while True:
     for segment in snake:
         pygame.draw.rect(window, (255, 255, 255), segment)
     pygame.draw.rect(window, (255, 0, 0), food)
+
+        # Draw the score
+    score_text = font.render("Score: " + str(score), True, (255, 255, 255))
+    window.blit(score_text, (10, 10))
 
     # Update the display
     pygame.display.flip()
