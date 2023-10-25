@@ -42,9 +42,15 @@ while True:
         new_head = pygame.Rect(snake[-1].x, snake[-1].y + SNAKE_SIZE, SNAKE_SIZE, SNAKE_SIZE)
 
     # Check if the snake hit the wall
-    if new_head.left < 0 or new_head.right > WINDOW_WIDTH or new_head.top < 0 or new_head.bottom > WINDOW_HEIGHT:
-        pygame.quit()
-        sys.exit()
+    if new_head.left < 0:
+        new_head.left = WINDOW_WIDTH - SNAKE_SIZE
+    elif new_head.right > WINDOW_WIDTH:
+        new_head.left = 0
+    elif new_head.top < 0:
+        new_head.top = WINDOW_HEIGHT - SNAKE_SIZE
+    elif new_head.bottom > WINDOW_HEIGHT:
+        new_head.top = 0
+
 
     # Check if the snake hit itself
     if new_head in snake:
@@ -84,4 +90,4 @@ while True:
     pygame.display.flip()
 
     # Limit the frame rate
-    clock.tick(30)
+    clock.tick(20)
