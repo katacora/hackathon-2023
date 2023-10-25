@@ -49,6 +49,7 @@ def game_over():
 def generate_food():
     return pygame.Rect(random.randint(0, WINDOW_WIDTH - SNAKE_SIZE), random.randint(0, WINDOW_HEIGHT - SNAKE_SIZE), SNAKE_SIZE, SNAKE_SIZE)
 
+
 # Set up the initial food
 food = generate_food()
 
@@ -73,12 +74,21 @@ def main_menu():
                 elif event.key == pygame.K_h:
                     return 1  # Hard mode (1 piece of food)
 
-        window.fill((0, 0, 0))
+        # Fondo del menu
+        bgdtile = pygame.image.load(os.path.join(os.path.dirname(__file__), "../imgs/bgimage.png")).convert()
+        SCREENRECT = pygame.Rect(0, 0, 800, 600)
+        background = pygame.Surface(SCREENRECT.size)
+        for x in range(0, SCREENRECT.width, bgdtile.get_width()):
+            background.blit(bgdtile, (x, 0))
+        window.blit(background, (0, 0))
+
         window.blit(title_text, (WINDOW_WIDTH // 2 - 90, 100))
         window.blit(easy_text, (WINDOW_WIDTH // 2 - 120, 200))
         window.blit(medium_text, (WINDOW_WIDTH // 2 - 140, 250))
         window.blit(hard_text, (WINDOW_WIDTH // 2 - 110, 300))
+
         pygame.display.flip()
+
 
 # Get the selected difficulty
 food_count = main_menu()
