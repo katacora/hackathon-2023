@@ -83,12 +83,18 @@ if food_count == 5:  # Easy mode
     FOOD_COUNT = 5
 elif food_count == 3:  # Medium mode
     FOOD_COUNT = 3
-else:  # Hard mode
+else:                   # Hard mode
     FOOD_COUNT = 1
 
 food_list = [generate_food() for _ in range(FOOD_COUNT)]
 
+# Set up the snake movement speed (milliseconds per movement)
+SNAKE_SPEED = 50  # Adjust this value to control the snake's speed
+last_move_time = 0
+
 while True:
+    current_time = pygame.time.get_ticks()
+
     # Handle events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -99,45 +105,46 @@ while True:
     has_eaten = False
 
     # Move the snake
-    if snake_direction == "right":
-        new_head = pygame.Rect(snake[-1].x + SNAKE_SIZE, snake[-1].y, SNAKE_SIZE, SNAKE_SIZE)
-    elif snake_direction == "left":
-        new_head = pygame.Rect(snake[-1].x - SNAKE_SIZE, snake[-1].y, SNAKE_SIZE, SNAKE_SIZE)
-    elif snake_direction == "up":
-        new_head = pygame.Rect(snake[-1].x, snake[-1].y - SNAKE_SIZE, SNAKE_SIZE, SNAKE_SIZE)
-    elif snake_direction == "down":
-        new_head = pygame.Rect(snake[-1].x, snake[-1].y + SNAKE_SIZE, SNAKE_SIZE, SNAKE_SIZE)
+    if current_time - last_move_time >= SNAKE_SPEED:
+        last_move_time = current_time
+        if snake_direction == "right":
+            new_head = pygame.Rect(snake[-1].x + SNAKE_SIZE, snake[-1].y, SNAKE_SIZE, SNAKE_SIZE)
+        elif snake_direction == "left":
+            new_head = pygame.Rect(snake[-1].x - SNAKE_SIZE, snake[-1].y, SNAKE_SIZE, SNAKE_SIZE)
+        elif snake_direction == "up":
+            new_head = pygame.Rect(snake[-1].x, snake[-1].y - SNAKE_SIZE, SNAKE_SIZE, SNAKE_SIZE)
+        elif snake_direction == "down":
+            new_head = pygame.Rect(snake[-1].x, snake[-1].y + SNAKE_SIZE, SNAKE_SIZE, SNAKE_SIZE)
 
-    # Check if the snake hit the wall
-    if new_head.left < 0:
-        new_head.left = WINDOW_WIDTH - SNAKE_SIZE
-    elif new_head.right > WINDOW_WIDTH:
-        new_head.left = 0
-    elif new_head.top < 0:
-        new_head.top = WINDOW_HEIGHT - SNAKE_SIZE
-    elif new_head.bottom > WINDOW_HEIGHT:
-        new_head.top = 0
+        # Check if the snake hit the wall
+        if new_head.left < 0:
+            new_head.left = WINDOW_WIDTH - SNAKE_SIZE
+        elif new_head.right > WINDOW_WIDTH:
+            new_head.left = 0
+        elif new_head.top < 0:
+            new_head.top = WINDOW_HEIGHT - SNAKE_SIZE
+        elif new_head.bottom > WINDOW_HEIGHT:
+            new_head.top = 0
 
-    # Check if the snake hit itself
-    if new_head in snake:
-        game_over()  # Call the Game Over function
-        break
+        # Check if the snake hit itself
+        if new_head in snake:
+            game_over()  # Call the Game Over function
+            break
 
-    # Check if the snake ate the food
-    for food in food_list:
-        if new_head.colliderect(food):
-            food_list.remove(food)
-            food_list.append(generate_food())
-            score += 1
-            has_eaten = True
+        # Check if the snake ate the food
+        for food in food_list:
+            if new_head.colliderect(food):
+                food_list.remove(food)
+                food_list.append(generate_food())
+                score += 1
+                has_eaten = True
 
-    # Add the new head to the snake
-    snake.append(new_head)
+        # Add the new head to the snake
+        snake.append(new_head)
 
-    # If the snake hasn't eaten, remove the tail segment
-    if not has_eaten:
-        snake.pop(0)
-
+        # If the snake hasn't eaten, remove the tail segment
+        if not has_eaten:
+            snake.pop(0)
 
     # Handle input
     keys = pygame.key.get_pressed()
@@ -167,4 +174,4 @@ while True:
     pygame.display.flip()
 
     # Limit the frame rate
-    clock.tick(10)  # Reduced frame rate for a slower snake
+    clock.tick(60)  # Set the frame rate to a reasonable value (e.g., 60 FPS)
