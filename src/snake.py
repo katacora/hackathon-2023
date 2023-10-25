@@ -1,5 +1,4 @@
-import sys
-import random
+import sys, os, random
 import pygame
 
 # Initialize Pygame
@@ -27,6 +26,13 @@ food = pygame.Rect(random.randint(0, WINDOW_WIDTH - FOOD_SIZE), random.randint(0
 score = 0
 font = pygame.font.SysFont(None, 30)
 
+# Set up the music from "../sounds/music.mp3" using os library
+def play_music():
+    music_file = os.path.join(os.path.dirname(__file__), "../sounds/music.mp3")
+    pygame.mixer.music.load(music_file)
+    pygame.mixer.music.play(-1)
+
+play_music()
 
 # Game loop
 while True:
