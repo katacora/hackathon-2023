@@ -37,13 +37,26 @@ def play_music():
 play_music()
 
 # Function to display the Game Over screen
-def game_over():
-    game_over_text = font.render("Game Over", True, (255, 0, 0))
-    window.blit(game_over_text, (WINDOW_WIDTH // 2 - 60, WINDOW_HEIGHT // 2))
+
+# Inicializar el estado del juego
+game_over = False
+
+# Función para mostrar un mensaje de "Game Over"
+def mostrar_game_over():
+    # Color de fondo
+    color_fondo = (0, 0, 0)  
+    
+    ventana.fill(color_fondo)  
+
+    # Fuente y color del texto
+    fuente = pygame.font.Font(None, 36)
+    color_texto = (255, 240, 0)  
+    
+    texto_game_over = fuente.render("Game Over Presiona ESPACIO para reiniciar", True, color_texto)
+    rectangulo_game_over = texto_game_over.get_rect(center=(ANCHO_VENTANA // 2, ALTO_VENTANA // 2))
+    
+    ventana.blit(texto_game_over, rectangulo_game_over)
     pygame.display.flip()
-    pygame.time.delay(1000)  # Wait for 1 second
-    pygame.quit()
-    sys.exit()
 
 # Function to generate food at a random location
 def generate_food():
@@ -190,3 +203,21 @@ while True:
 
     # Limit the frame rate
     clock.tick(60)  # Set the frame rate to a reasonable value (e.g., 60 FPS)
+
+
+     # Mostrar "Game Over" si el juego ha terminado
+    while game_over:
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if evento.type == pygame.KEYDOWN:
+                if evento.key == pygame.K_SPACE:
+                    # Reiniciar el juego
+                    serpiente = [pygame.Rect(ANCHO_VENTANA // 2, ALTO_VENTANA // 2, TAMANO_SERPIENTE, TAMANO_SERPIENTE)]
+                    direccion_serpiente = "derecha"
+                    comida.x = random.randint(0, ANCHO_VENTANA - TAMANO_COMIDA)
+                    comida.y = random.randint(0, ALTO_VENTANA - TAMANO_COMIDA)
+                    game_over = False
+
+        mostrar_game_over()
