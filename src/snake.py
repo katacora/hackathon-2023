@@ -84,4 +84,4 @@ while True:
     pygame.display.flip()
 
     # Limit the frame rate
-    clock.tick(10)
+    clock.tick(30)
