@@ -19,6 +19,11 @@ SNAKE_SIZE = 20
 snake = [pygame.Rect(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2, SNAKE_SIZE, SNAKE_SIZE)]
 snake_direction = "right"
 
+FOOD_SIZE = 20
+food_image_file = os.path.join(os.path.dirname(__file__), "../imgs/apple.png")
+food_image = pygame.image.load(food_image_file).convert_alpha()
+food = pygame.Rect(random.randint(0, WINDOW_WIDTH - FOOD_SIZE), random.randint(0, WINDOW_HEIGHT - FOOD_SIZE), FOOD_SIZE, FOOD_SIZE)
+
 # Set up the score
 score = 0
 font = pygame.font.SysFont(None, 30)
@@ -164,7 +169,7 @@ while True:
     for segment in snake:
         pygame.draw.rect(window, (255, 255, 255), segment)
     for food in food_list:
-        pygame.draw.rect(window, (255, 0, 0), food)
+        window.blit(food_image, food)
 
     # Draw the score
     score_text = font.render("Score: " + str(score), True, (255, 255, 255))
